@@ -2,8 +2,10 @@ package by.bsuir;
 
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import javafx.scene.effect.Light;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.application.Application;
@@ -12,11 +14,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 import javax.vecmath.Vector2f;
+import java.awt.*;
 import java.time.LocalTime;
 
 
 public class Main extends Application{
-
+    public static Point point;
     public static AnchorPane root = new AnchorPane();
     public static Rectangle rectangle = new Rectangle(50,450,400,200);
     public static Field field = new Field();
@@ -48,7 +51,8 @@ public class Main extends Application{
 
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED,escape);
-        scene.addEventHandler(KeyEvent.KEY_PRESSED,shift);
+        scene.addEventHandler(KeyEvent.KEY_PRESSED,alt);
+        root.addEventHandler(MouseEvent.MOUSE_MOVED,cursorCoordinate);
     }
 
     public void initializeRootPane(){
@@ -86,16 +90,22 @@ public class Main extends Application{
         }
     };
 
-    EventHandler<KeyEvent> shift = new EventHandler<KeyEvent>() {
+    EventHandler<KeyEvent> alt = new EventHandler<KeyEvent>() {
         @Override
         public void handle(KeyEvent keyEvent) {
-            if(keyEvent.getCode() == KeyCode.SHIFT){
+            if(keyEvent.getCode() == KeyCode.ALT){
                 for (int i = 0; i < ships.length; i++) {
                     if(ships[i].getIsMoved()){
                         ships[i].rotate();
                     }
                 }
             }
+        }
+    };
+    EventHandler<MouseEvent> cursorCoordinate = new EventHandler<MouseEvent>() {
+        @Override
+        public void handle(MouseEvent event) {
+            point = new Point((int)event.getSceneX(),(int)event.getSceneY());
         }
     };
 }

@@ -1,12 +1,14 @@
 package by.bsuir;
 
 import javafx.event.EventHandler;
+import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javax.vecmath.Vector2f;
+import java.awt.*;
 
 public class Ship{
     private int length;
@@ -24,6 +26,8 @@ public class Ship{
     private boolean isChoose;
     private boolean isMoved;
     private boolean isHorizontal;
+
+    private Point pointDruggedShip;
 
     public Ship(int length, Vector2f posInRectangle){
         this.length = length;
@@ -132,9 +136,12 @@ public class Ship{
                         ship_image[i].setLayoutX((event.getSceneX() - shiftX) + (i * 40));
                         ship_image[i].setLayoutY(event.getSceneY() - shiftY);
                     }else {
-                        ship_image[i].setLayoutX(event.getSceneX() - shiftX);
-                        ship_image[i].setLayoutY(event.getSceneY() - shiftY + (i * 40));
+                     //   ship_image[i].setLayoutX(event.getSceneX() - shiftX);
+                     //   ship_image[i].setLayoutY(event.getSceneY() - shiftY + (i * 40));
+                        ship_image[i].setLayoutX(event.getSceneX());
+                        ship_image[i].setLayoutY(event.getSceneY() + (i * 40));
                     }
+                    pointDruggedShip = new Point((int)event.getSceneX(),(int)event.getSceneY());
                 }
                 currentPos.x = (float) ship_image[0].getLayoutX();
                 currentPos.y = (float) ship_image[0].getLayoutY();
@@ -222,15 +229,15 @@ public class Ship{
         float startX = (float) ship_image[0].getLayoutX();
         float startY = (float) ship_image[0].getLayoutY();
         if(isHorizontal){
-            for (int i = 1; i < length ; i++) {
-                ship_image[i].setLayoutX(startX);
-                ship_image[i].setLayoutY(startY + (40 * i));
+            for (int i = 0; i < length ; i++) {
+                ship_image[i].setLayoutX(pointDruggedShip.x);
+                ship_image[i].setLayoutY(pointDruggedShip.y + (40 * i));
             }
             isHorizontal = false;
         }else {
-            for (int i = 1; i < length ; i++) {
-                ship_image[i].setLayoutX(startX+ (40 * i));
-                ship_image[i].setLayoutY(startY);
+            for (int i = 0; i < length ; i++) {
+                ship_image[i].setLayoutX(pointDruggedShip.x - shiftX+ (40 * i));
+                ship_image[i].setLayoutY(pointDruggedShip.y - shiftY);
             }
             isHorizontal = true;
         }
