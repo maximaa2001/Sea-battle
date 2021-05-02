@@ -1,6 +1,7 @@
 package by.bsuir;
 
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.effect.Light;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -135,6 +136,7 @@ public class Ship{
             isCanMoved = true;
             isHorizontal = true;
         }
+        addSome();
     }
 
     EventHandler<MouseEvent> dragged = new EventHandler<MouseEvent>() {
@@ -201,7 +203,7 @@ public class Ship{
                     Проверка свободного места в массиве
                      */
                     if(isHorizontal){
-                        if(!checkFreeSpaceX(new Vector2f(column,row),length)){
+                        if(!checkFreeSpaceX(new Vector2f(column,row))){
                             returnShip();
                             return;
                         }
@@ -214,6 +216,7 @@ public class Ship{
                     /*
                     добавление корабля на поле
                      */
+                    Group group = new Group();
                     for (int i = 0; i < length; i++) {
                         if(isHorizontal) {
                             Main.field.add(ship_image[i], column + i, row);
@@ -362,13 +365,14 @@ public class Ship{
         }
     }
 
-    private boolean checkFreeSpaceX(Vector2f vector,int line){
+    private boolean checkFreeSpaceX(Vector2f vector){
         int startX = (int) vector.x;
-        int endX = (int) vector.x + (line-1);
+        int endX = (int) vector.x + (length-1);
         int y = (int) vector.y;
 
-        for (int i = startX; i <= endX ; i++) {
-            if(Main.field.getField()[y][i].equals("-") || Main.field.getField()[y][i].equals("*")){
+
+        for (int i = startX; i <= endX; i++) {
+            if (Main.field.getField()[y][i].equals("-") || Main.field.getField()[y][i].equals("*")) {
                 return false;
             }
         }
@@ -440,5 +444,38 @@ public class Ship{
             }
         }
         return true;
+    }
+
+    private void addSome(){
+        for (int i = 0; i < Main.field.getField().length; i++) {
+            for (int j = 0; j < Main.field.getField()[i].length; j++) {
+                if(Main.field.getField()[i][j].equals("*")){
+                    if(i - 1 >= 0 && !(Main.field.getField()[i-1][j].equals("*"))){
+                        Main.field.getField()[i-1][j] = "-";
+                    }
+                    if(i - 1 >= 0 && j-1 >=0 && !(Main.field.getField()[i-1][j-1].equals("*"))){
+                        Main.field.getField()[i-1][j-1] = "-";
+                    }
+                    if(j-1 >=0 && !(Main.field.getField()[i][j-1].equals("*"))){
+                        Main.field.getField()[i][j-1] = "-";
+                    }
+                    if(i + 1 <= 9 && j-1 >=0 && !(Main.field.getField()[i+1][j-1].equals("*"))){
+                        Main.field.getField()[i+1][j-1] = "-";
+                    }
+                    if(i + 1 <= 9 && !(Main.field.getField()[i+1][j].equals("*"))){
+                        Main.field.getField()[i+1][j] = "-";
+                    }
+                    if(i + 1 <= 9 && j+1 <=9 && !(Main.field.getField()[i+1][j+1].equals("*"))){
+                        Main.field.getField()[i+1][j+1] = "-";
+                    }
+                    if(j+1 <= 9 && !(Main.field.getField()[i][j+1].equals("*"))){
+                        Main.field.getField()[i][j+1] = "-";
+                    }
+                    if(i - 1 >= 0 && j+1 <=9 && !(Main.field.getField()[i-1][j+1].equals("*"))){
+                        Main.field.getField()[i-1][j+1] = "-";
+                    }
+                }
+            }
+        }
     }
 }
