@@ -12,10 +12,10 @@ public class Field extends GridPane {
         buttons = new MyButton[100];
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new MyButton(String.valueOf(i));
-//            int finalI = i;
-//            buttons[i].setOnMouseClicked(event -> {
-//                System.out.println(this.buttons[finalI].getMyId());
-//            });
+            int finalI = i;
+            buttons[i].setOnMouseClicked(event -> {
+                System.out.println(this.buttons[finalI].getMyId());
+            });
         }
 
         this.setGridLinesVisible(true);
@@ -35,6 +35,12 @@ public class Field extends GridPane {
                     this.add(button, j, i);
                     count++;
                 }
+            }
+        }
+
+        for (int i = 0; i < field.length; i++) {
+            for (int j = 0; j < field[i].length; j++) {
+                field[i][j] = "0";
             }
         }
     }

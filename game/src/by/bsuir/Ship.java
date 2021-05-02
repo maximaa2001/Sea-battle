@@ -7,6 +7,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+
+import javax.vecmath.Vector2d;
 import javax.vecmath.Vector2f;
 import java.awt.*;
 
@@ -103,8 +105,21 @@ public class Ship{
 
     public void returnShip(){
         currentImage = new Image("by/bsuir/image/black_block.png");
+        boolean isRemoveAround = false;
         for (int i = 0; i < length; i++) {
             if(!Main.root.getChildren().contains(ship_image[i])){
+                int column =(int) (ship_image[i].getLayoutX() / 40);
+                int row =(int) (ship_image[i].getLayoutY() / 40);
+                if(!isRemoveAround){
+                    if(isHorizontal){
+                        markAroundShipX(new Vector2f(column,row),"0");
+                    }else {
+                        markAroundShipY(new Vector2f(column,row),"0");
+                    }
+                    isRemoveAround = true;
+                }
+                Main.field.getField()[row][column] = "0";
+
                 Main.field.getChildren().remove(ship_image[i]);
                 Main.root.getChildren().add(ship_image[i]);
             }
@@ -182,6 +197,23 @@ public class Ship{
                     }else {
                         row = ((int) vector2f.y / 40);
                     }
+                    /*
+                    Проверка свободного места в массиве
+                     */
+                    if(isHorizontal){
+                        if(!checkFreeSpaceX(new Vector2f(column,row),length)){
+                            returnShip();
+                            return;
+                        }
+                    }else {
+                       if(!checkFreeSpaceY(new Vector2f(column,row))){
+                           returnShip();
+                           return;
+                       }
+                    }
+                    /*
+                    добавление корабля на поле
+                     */
                     for (int i = 0; i < length; i++) {
                         if(isHorizontal) {
                             Main.field.add(ship_image[i], column + i, row);
@@ -189,6 +221,27 @@ public class Ship{
                             Main.field.add(ship_image[i], column , row + i);
                         }
                         Main.root.getChildren().remove(ship_image[i]);
+                    }
+                    /*
+                    отметка в массиве занятого места
+                     */
+                    if(isHorizontal){
+                        for (int i = 0; i < length ; i++) {
+                           Main.field.getField()[row][column+i] = "*";
+                        }
+                    }else {
+                        for (int i = 0; i < length ; i++) {
+                           Main.field.getField()[row+i][column] = "*";
+                        }
+                    }
+                    /*
+                    Отметить в массиве поле вокруг корабля
+                     */
+                    Vector2f vector = new Vector2f(column, row);
+                    if(isHorizontal){
+                        markAroundShipX(vector, "-");
+                    }else {
+                        markAroundShipY(vector, "-");
                     }
                     isCanMoved = false;
                 }
@@ -200,6 +253,15 @@ public class Ship{
                 isShift = false;
                 isMoved = false;
             }
+
+            for (int i = 0; i < Main.field.getField().length; i++) {
+                for (int j = 0; j < Main.field.getField()[i].length; j++) {
+                    System.out.print(Main.field.getField()[i][j] + "  ");
+                }
+                System.out.println();
+            }
+            System.out.println();
+            System.out.println();
         }
     };
 
@@ -226,8 +288,6 @@ public class Ship{
     };
 
     public void rotate(){
-        float startX = (float) ship_image[0].getLayoutX();
-        float startY = (float) ship_image[0].getLayoutY();
         if(isHorizontal){
             for (int i = 0; i < length ; i++) {
                 ship_image[i].setLayoutX(pointDruggedShip.x);
@@ -241,5 +301,144 @@ public class Ship{
             }
             isHorizontal = true;
         }
+    }
+
+    private void markAroundShipX(Vector2f coordinate, String str){
+        Vector2f vector = coordinate;
+
+        int vectorStartX = (int) vector.x;
+        int vectorEndX = vectorStartX + (length -1);
+        int vectorY = (int) vector.y;
+
+        for (int i = vectorY - 1; i <= vectorY + 1 ; i++) {
+            if((i < 0) || (i > 9)){
+                continue;
+            }
+            for (int j = vectorStartX - 1; j <= vectorEndX + 1 ; j++) {
+                if((j < 0) || (j > 9)){
+                    continue;
+                }
+                if(i == vectorY){
+                    if((vectorStartX - 1) >= 0) {
+                        Main.field.getField()[i][vectorStartX - 1] = str;
+                    }
+                    if((vectorEndX + 1) <= 9) {
+                        Main.field.getField()[i][vectorEndX + 1] = str;
+                    }
+                    break;
+                }else {
+                    Main.field.getField()[i][j] = str;
+                }
+            }
+        }
+    }
+
+    private void markAroundShipY(Vector2f coordinate, String str){
+        Vector2f vector = coordinate;
+        int vectorStartY = (int) vector.y;
+        int vectorEndY = vectorStartY + (length - 1);
+        int vectorX = (int) vector.x;
+
+        for (int i = vectorX - 1; i <= vectorX + 1 ; i++) {
+            if((i < 0) || (i > 9)){
+                continue;
+            }
+            for (int j = vectorStartY - 1; j <= vectorEndY + 1 ; j++) {
+                if((j < 0) || (j > 9)){
+                    continue;
+                }
+                if(i == vectorX){
+                    if(vectorStartY - 1 >= 0) {
+                        Main.field.getField()[vectorStartY - 1][i] = str;
+                    }
+                    if((vectorEndY + 1) <= 9) {
+                        Main.field.getField()[vectorEndY + 1][i] = str;
+                    }
+                    break;
+                }else {
+                    Main.field.getField()[j][i] = str;
+                }
+            }
+        }
+    }
+
+    private boolean checkFreeSpaceX(Vector2f vector,int line){
+        int startX = (int) vector.x;
+        int endX = (int) vector.x + (line-1);
+        int y = (int) vector.y;
+
+        for (int i = startX; i <= endX ; i++) {
+            if(Main.field.getField()[y][i].equals("-") || Main.field.getField()[y][i].equals("*")){
+                return false;
+            }
+        }
+
+        for (int i = y - 1; i < y + 1 ; i++) {
+            if((i < 0) || (i > 9)){
+                continue;
+            }
+            for (int j = startX - 1; j <= endX + 1; j++) {
+                if((j < 0) || (j > 9)){
+                    continue;
+                }
+                if(i == y){
+                    if((startX - 1) >= 0) {
+                        if (Main.field.getField()[i][startX - 1].equals("*")) {
+                            return false;
+                        }
+                    }
+                    if((endX + 1) <= 9){
+                        if (Main.field.getField()[i][endX + 1].equals("*")) {
+                            return false;
+                        }
+                    }
+                    break;
+                }
+                if(Main.field.getField()[i][j].equals("*")){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkFreeSpaceY(Vector2f vector){
+        int startY = (int) vector.y;
+        int endY = (int) vector.y + (length-1);
+        int x = (int) vector.x;
+
+        for (int i = startY; i <= endY ; i++) {
+            if(Main.field.getField()[i][x].equals("-") || Main.field.getField()[i][x].equals("*")){
+                return false;
+            }
+        }
+
+        for (int i = x - 1; i < x + 1 ; i++) {
+            if((i < 0) || (i > 9)){
+                continue;
+            }
+            for (int j = startY - 1; j <= endY + 1; j++) {
+                if((j < 0) || (j > 9)){
+                    continue;
+                }
+                if(i == x){
+                    if((startY - 1) >= 0) {
+                        if (Main.field.getField()[startY - 1][i].equals("*")) {
+                            return false;
+                        }
+                    }
+                    if((endY + 1) <= 9){
+                        if (Main.field.getField()[endY + 1][i].equals("*")) {
+                            return false;
+                        }
+                    }
+                    break;
+                }
+                if(Main.field.getField()[j][i].equals("*")){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
