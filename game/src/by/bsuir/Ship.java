@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javax.vecmath.Vector2d;
 import javax.vecmath.Vector2f;
 import java.awt.*;
+import java.io.IOException;
 
 public class Ship{
     private int length;
@@ -66,6 +67,10 @@ public class Ship{
 
     public boolean getIsChoose() {
         return isChoose;
+    }
+
+    public boolean getIsCanMoved() {
+        return isCanMoved;
     }
 
     public ImageView[] getShipImage() {
@@ -135,6 +140,7 @@ public class Ship{
             isChoose = false;
             isCanMoved = true;
             isHorizontal = true;
+            isMoved = false;
         }
         addSome();
     }
@@ -205,18 +211,19 @@ public class Ship{
                     if(isHorizontal){
                         if(!checkFreeSpaceX(new Vector2f(column,row))){
                             returnShip();
+                            getMessage("Сюда нельзя ставить корабль");
                             return;
                         }
                     }else {
                        if(!checkFreeSpaceY(new Vector2f(column,row))){
                            returnShip();
+                           getMessage("Сюда нельзя ставить корабль");
                            return;
                        }
                     }
                     /*
                     добавление корабля на поле
                      */
-                    Group group = new Group();
                     for (int i = 0; i < length; i++) {
                         if(isHorizontal) {
                             Main.field.add(ship_image[i], column + i, row);
@@ -370,7 +377,6 @@ public class Ship{
         int endX = (int) vector.x + (length-1);
         int y = (int) vector.y;
 
-
         for (int i = startX; i <= endX; i++) {
             if (Main.field.getField()[y][i].equals("-") || Main.field.getField()[y][i].equals("*")) {
                 return false;
@@ -446,7 +452,7 @@ public class Ship{
         return true;
     }
 
-    private void addSome(){
+    private void addSome(){  // при отмене позиции корабля установка необходимых -
         for (int i = 0; i < Main.field.getField().length; i++) {
             for (int j = 0; j < Main.field.getField()[i].length; j++) {
                 if(Main.field.getField()[i][j].equals("*")){
@@ -476,6 +482,25 @@ public class Ship{
                     }
                 }
             }
+        }
+    }
+
+    private void getMessage(String message){
+        try {
+            WarnMessage warnMessage = new WarnMessage(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void readyForBattle(){
+        Image image = new Image("by/bsuir/image/green_block.png");
+        for (int i = 0; i < length; i++) {
+            ship_image[i].setImage(image);
+            ship_image[i].removeEventHandler(MouseEvent.MOUSE_DRAGGED,dragged);
+            ship_image[i].removeEventHandler(MouseEvent.MOUSE_PRESSED,pressed);
+            ship_image[i].removeEventHandler(MouseEvent.MOUSE_RELEASED,released);
+            ship_image[i].removeEventHandler(MouseEvent.MOUSE_CLICKED,clicked);
         }
     }
 }

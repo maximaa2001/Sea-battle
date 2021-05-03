@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="800.0" prefWidth="1000.0" styleClass="anchor" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label fx:id="label_game" alignment="CENTER" contentDisplay="CENTER" layoutX="576.0" layoutY="298.0" prefHeight="30.0" prefWidth="180.0" text="Играть" textFill="WHITE" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="300.0">
+         <font>
+            <Font size="47.0" />
+         </font>
+      </Label>
+      <Label fx:id="label_about" alignment="CENTER" contentDisplay="CENTER" layoutX="510.0" layoutY="307.0" prefHeight="30.0" prefWidth="180.0" text="Об игре" textFill="WHITE" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="380.0">
+         <font>
+            <Font size="47.0" />
+         </font>
+      </Label>
+      <Label fx:id="label_exit" alignment="CENTER" contentDisplay="CENTER" layoutX="520.0" layoutY="317.0" prefHeight="30.0" prefWidth="180.0" text="Выйти" textFill="WHITE" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="460.0">
+         <font>
+            <Font size="47.0" />
+         </font>
+      </Label>
+   </children>
+</AnchorPane>

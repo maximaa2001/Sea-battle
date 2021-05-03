@@ -5,3 +5,24 @@
     -fx-border-color:red;
 }
 
+.my{
+    -fx-font-size: 15px;
+}
+
+.my:hover{
+    -fx-background-color: #00FF00;
+    -fx-border-width: 2px;
+    -fx-border-color: black;
+}
+
+.my:pressed{
+    -fx-background-color: yellow;
+}
+
+.anchor {
+    -fx-background-image: url("../image/menu.jpg");
+    -fx-background-color: green;
+}
+.red_label{
+    -fx-background-color: #DC143C;
+}

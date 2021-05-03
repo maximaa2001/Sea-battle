@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="141.0" prefWidth="403.0" style="-fx-background-color: #a9a9a9;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <AnchorPane layoutX="-4.0" layoutY="37.0" prefHeight="102.0" prefWidth="407.0" style="-fx-background-color: #fafafa;">
+            <children>
+                <Label fx:id="label_message" alignment="TOP_CENTER" layoutX="14.0" layoutY="8.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="54.0" prefWidth="382.0" wrapText="true">
+                    <font>
+                        <Font size="14.0" />
+                    </font>
+                </Label>
+                <Button fx:id="btn_close" layoutX="156.0" layoutY="70.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="95.0" text="Закрыть" />
+            </children>
+        </AnchorPane>
+        <Label alignment="CENTER" layoutX="-2.0" prefHeight="38.0" prefWidth="403.0" text="Что-то пошло не так!!!" textOverrun="CLIP">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Label>
+      <ImageView fitHeight="38.0" fitWidth="32.0" layoutX="65.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../image/info.png" />
+         </image>
+      </ImageView>
+    </children>
+</AnchorPane>

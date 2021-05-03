@@ -1,6 +1,7 @@
 package by.bsuir;
 
 import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.effect.Light;
 import javafx.scene.input.KeyCode;
@@ -15,11 +16,11 @@ import javafx.stage.Stage;
 
 import javax.vecmath.Vector2f;
 import java.awt.*;
+import java.io.IOException;
 import java.time.LocalTime;
 
 
 public class Main extends Application{
-    public static Point point;
     public static AnchorPane root = new AnchorPane();
     public static Rectangle rectangle = new Rectangle(50,450,400,200);
     public static Field field = new Field();
@@ -35,24 +36,48 @@ public class Main extends Application{
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(Stage stage) throws IOException {
         stage.setResizable(false);
+        Button button = new Button("Готов");
+        button.setLayoutX(50);
+        button.setLayoutY(410);
+        button.setPrefWidth(400);
+        button.setPrefHeight(20);
+        button.getStyleClass().add("my");
+        root.getChildren().add(button);
 
         initializeRootPane();
         initializeMyField();
         initializeMyShipPane();
         initializeMyShips();
 
+
+
         Scene scene = new Scene(root,1000,800);
         scene.getStylesheets().add(0, "by/bsuir/styles/style.css");
+        stage.addEventHandler(KeyEvent.KEY_PRESSED,escape);
+        stage.addEventHandler(KeyEvent.KEY_PRESSED,alt);
+
+        button.setOnMouseClicked(event -> {
+            for (int i = 0; i < ships.length; i++) {
+                if(ships[i].getIsCanMoved()){
+                    return;
+                }
+            }
+            for (int i = 0; i < ships.length; i++) {
+                ships[i].readyForBattle();
+            }
+            root.getChildren().remove(button);
+            root.getChildren().remove(rectangle);
+            stage.removeEventHandler(KeyEvent.KEY_PRESSED,escape);
+            stage.removeEventHandler(KeyEvent.KEY_PRESSED,alt);
+        });
+
+      // Menu menu = new Menu(stage);
+
         stage.setScene(scene);
         stage.setTitle("Морской бой");
         stage.show();
-
-
-        scene.addEventHandler(KeyEvent.KEY_PRESSED,escape);
-        scene.addEventHandler(KeyEvent.KEY_PRESSED,alt);
-        root.addEventHandler(MouseEvent.MOUSE_MOVED,cursorCoordinate);
     }
 
     public void initializeRootPane(){
@@ -100,12 +125,6 @@ public class Main extends Application{
                     }
                 }
             }
-        }
-    };
-    EventHandler<MouseEvent> cursorCoordinate = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent event) {
-            point = new Point((int)event.getSceneX(),(int)event.getSceneY());
         }
     };
 }
