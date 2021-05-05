@@ -5,24 +5,45 @@
     -fx-border-color:red;
 }
 
-.my{
+.ready{
     -fx-font-size: 15px;
 }
 
-.my:hover{
+.ready:hover{
     -fx-background-color: #00FF00;
     -fx-border-width: 2px;
     -fx-border-color: black;
 }
 
-.my:pressed{
+.ready:pressed{
     -fx-background-color: yellow;
 }
 
 .anchor {
     -fx-background-image: url("../image/menu.jpg");
-    -fx-background-color: green;
 }
 .red_label{
     -fx-background-color: #DC143C;
+}
+
+.field_in_connect{
+    -fx-border-width: 2;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.field_in_connect:focused{
+    -fx-border-color: #FF0000;
+}
+
+.btn_in_connect{
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.btn_in_connect:hover{
+    -fx-background-color: #A9A9A9;
+}
+.btn_in_connect:pressed{
+    -fx-background-color: #00FF00;
 }

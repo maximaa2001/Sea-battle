@@ -31,6 +31,7 @@ public class WarnMessage {
     public WarnMessage(String message) throws IOException {
         this.message = message;
         stage = new Stage();
+        stage.setResizable(false);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("fxml/WarnMessage.fxml"));
         fxmlLoader.setController(this);
         stage.setScene(new Scene(fxmlLoader.load()));

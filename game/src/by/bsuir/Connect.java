@@ -1,0 +1,148 @@
+package by.bsuir;
+
+import java.io.IOException;
+import java.net.*;
+import java.util.ResourceBundle;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+
+public class Connect {
+
+    @FXML
+    private ResourceBundle resources;
+
+    @FXML
+    private URL location;
+
+    @FXML
+    private TextField ip_field;
+
+    @FXML
+    private TextField port_field;
+
+    @FXML
+    private Button btn_connect;
+
+    @FXML
+    private Button btn_create;
+
+    @FXML
+    private Button btn_cancel;
+
+    @FXML
+    private Label label_state;
+
+    @FXML
+    private TextField server_port_field;
+
+    private int server_port;
+
+    private InetAddress client_ip;
+    private int client_port;
+
+    private Thread waitingGamer;
+    private ServerSocket serverSocket;
+    private Socket socket;
+
+    @FXML
+    void initialize() {
+        btn_create.setOnMouseClicked(event -> {
+            if(!server_port_field.getText().equals("")) {
+                try {
+                    server_port = Integer.parseInt(server_port_field.getText());
+                }catch (NumberFormatException e){
+                    getMessage("Введите корректный порт");
+                    return;
+                }
+                try {
+                    serverSocket = new ServerSocket(server_port,1);
+                    waitingGamer = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                System.out.println("второй поток");
+                                socket = serverSocket.accept();
+                                System.out.println("Не должно выводить");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }finally {
+                                if(!serverSocket.isClosed()){
+                                    try {
+                                        serverSocket.close();
+                                        socket.close();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    waitingGamer.start();
+                    label_state.setText("Ожидание второго игрока");
+                    label_state.setTextFill(Color.GREEN);
+                } catch (IOException e) {
+                    getMessage("Попробуйте использовать другой порт");
+              //      e.printStackTrace();
+                }
+            }else {
+               getMessage("Введите номер порта");
+            }
+        });
+
+        btn_cancel.setOnMouseClicked(event -> {
+            if(serverSocket != null && !serverSocket.isClosed()){
+                try {
+                    serverSocket.close();
+                    label_state.setText("Игра не создана");
+                    label_state.setTextFill(Color.RED);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        btn_connect.setOnMouseClicked(event -> {
+            if(!ip_field.getText().equals("")){
+                if(!port_field.getText().equals("")){
+                    try {
+                        client_ip = InetAddress.getByName(ip_field.getText());
+                    } catch (UnknownHostException e) {
+                        getMessage("Неверный IP адрес");
+                       // e.printStackTrace();
+                    }
+                    try {
+                        client_port = Integer.parseInt(port_field.getText());
+                    }catch (NumberFormatException e){
+                        getMessage("Введите корректный порт");
+                    }
+                    try {
+                        socket = new Socket(client_ip,client_port);
+                        if(socket.isConnected()){
+                            System.out.println("Ok");
+                        }else {
+                            getMessage("Сервер недоступен");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    getMessage("Введите порт");
+                }
+            }else {
+                getMessage("Введите IP адрес");
+            }
+        });
+    }
+
+    private void getMessage(String str){
+        try {
+            WarnMessage message = new WarnMessage(str);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

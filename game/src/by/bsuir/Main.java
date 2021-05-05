@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import javax.vecmath.Vector2f;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 
@@ -43,14 +44,13 @@ public class Main extends Application{
         button.setLayoutY(410);
         button.setPrefWidth(400);
         button.setPrefHeight(20);
-        button.getStyleClass().add("my");
+        button.getStyleClass().add("ready");
         root.getChildren().add(button);
 
         initializeRootPane();
         initializeMyField();
         initializeMyShipPane();
         initializeMyShips();
-
 
 
         Scene scene = new Scene(root,1000,800);
@@ -73,11 +73,11 @@ public class Main extends Application{
             stage.removeEventHandler(KeyEvent.KEY_PRESSED,alt);
         });
 
-      // Menu menu = new Menu(stage);
+      Menu menu = new Menu(stage);
 
-        stage.setScene(scene);
-        stage.setTitle("Морской бой");
-        stage.show();
+       // stage.setScene(scene);
+      //  stage.setTitle("Морской бой");
+      //  stage.show();
     }
 
     public void initializeRootPane(){

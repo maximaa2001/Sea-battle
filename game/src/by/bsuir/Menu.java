@@ -13,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class Menu {
@@ -38,10 +39,12 @@ public class Menu {
     private int number_choose;
     private Stage stage;
     private Scene scene;
+    private Font font;
 
     public Menu(Stage stage) throws IOException {
         this.stage = stage;
         number_choose = 1;
+        font = Font.loadFont(getClass().getResourceAsStream("fonts/font.ttf"), 45);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("fxml/Menu.fxml"));
         fxmlLoader.setController(this);
         scene = new Scene(fxmlLoader.load());
@@ -54,8 +57,12 @@ public class Menu {
     @FXML
     void initialize() {
         label_game.getStyleClass().add("red_label");
+        label_game.setFont(font);
+        label_about.setFont(font);
+        label_exit.setFont(font);
         stage.addEventHandler(KeyEvent.KEY_PRESSED,down);
         stage.addEventHandler(KeyEvent.KEY_PRESSED,up);
+        stage.addEventHandler(KeyEvent.KEY_PRESSED,enter);
     }
 
     EventHandler<KeyEvent> down = new EventHandler<KeyEvent>() {
@@ -108,5 +115,35 @@ public class Menu {
         }
     };
 
+    EventHandler<KeyEvent> enter = new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent keyEvent) {
+            if (keyEvent.getCode() == KeyCode.ENTER) {
+                switch (number_choose){
+                    case 1:
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/Connect.fxml"));
+                        try {
+                            Stage stage = new Stage();
+                            stage.setScene(new Scene(loader.load()));
+                            Menu.this.stage.close();
+                            stage.setTitle("Подключение");
+                            stage.setResizable(false);
+                            stage.setOnCloseRequest(windowEvent -> {
+                                System.exit(0);
+                            });
+                            stage.show();
 
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        Menu.this.stage.close();
+                        break;
+                }
+            }
+        }
+    };
 }
