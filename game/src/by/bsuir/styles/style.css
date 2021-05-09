@@ -5,6 +5,17 @@
     -fx-border-color:red;
 }
 
+.aliveButton{
+    -fx-background-color: green;
+}
+
+.killButton{
+    -fx-background-color: red;
+}
+.mimoButton{
+    -fx-background-color: yellow;
+}
+
 .ready{
     -fx-font-size: 15px;
 }
@@ -46,4 +57,12 @@
 }
 .btn_in_connect:pressed{
     -fx-background-color: #00FF00;
+}
+
+.timer{
+    -fx-font-size: 20;
+}
+
+.whoIsMove{
+    -fx-font-size: 50;
 }

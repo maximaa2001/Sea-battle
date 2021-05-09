@@ -3,10 +3,17 @@ package by.bsuir;
 import java.io.IOException;
 import java.net.*;
 import java.util.ResourceBundle;
+
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -39,6 +46,8 @@ public class Connect {
     @FXML
     private TextField server_port_field;
 
+    private Stage stage;
+    private Scene scene;
     private int server_port;
 
     private InetAddress client_ip;
@@ -48,9 +57,30 @@ public class Connect {
     private ServerSocket serverSocket;
     private Socket socket;
 
+    public Connect(Stage stage) throws IOException {
+        this.stage = stage;
+        stage.setWidth(600);
+        stage.setHeight(392);
+        stage.setTitle("Подключение");
+        stage.setResizable(false);
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("fxml/Connect.fxml"));
+        fxmlLoader.setController(this);
+        scene = new Scene(fxmlLoader.load());
+        stage.setScene(scene);
+        stage.centerOnScreen();
+        stage.show();
+    }
+
     @FXML
     void initialize() {
+        stage.addEventHandler(KeyEvent.KEY_PRESSED,esc);
         btn_create.setOnMouseClicked(event -> {
+            if(serverSocket != null){
+                if(!serverSocket.isClosed()){
+                    getMessage("Отмените созданную игру");
+                    return;
+                }
+            }
             if(!server_port_field.getText().equals("")) {
                 try {
                     server_port = Integer.parseInt(server_port_field.getText());
@@ -66,14 +96,26 @@ public class Connect {
                             try {
                                 System.out.println("второй поток");
                                 socket = serverSocket.accept();
-                                System.out.println("Не должно выводить");
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            Stage stage = (Stage) btn_cancel.getScene().getWindow();
+                                            stage.close();
+                                            Game game = new Game(socket,true);
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                                System.out.println("второй поток закрыт");
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }finally {
                                 if(!serverSocket.isClosed()){
                                     try {
                                         serverSocket.close();
-                                        socket.close();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -81,6 +123,8 @@ public class Connect {
                             }
                         }
                     });
+
+                    waitingGamer.setDaemon(true);
                     waitingGamer.start();
                     label_state.setText("Ожидание второго игрока");
                     label_state.setTextFill(Color.GREEN);
@@ -106,37 +150,58 @@ public class Connect {
         });
 
         btn_connect.setOnMouseClicked(event -> {
-            if(!ip_field.getText().equals("")){
-                if(!port_field.getText().equals("")){
-                    try {
-                        client_ip = InetAddress.getByName(ip_field.getText());
-                    } catch (UnknownHostException e) {
-                        getMessage("Неверный IP адрес");
-                       // e.printStackTrace();
-                    }
-                    try {
-                        client_port = Integer.parseInt(port_field.getText());
-                    }catch (NumberFormatException e){
-                        getMessage("Введите корректный порт");
-                    }
-                    try {
-                        socket = new Socket(client_ip,client_port);
-                        if(socket.isConnected()){
-                            System.out.println("Ok");
-                        }else {
-                            getMessage("Сервер недоступен");
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }else {
-                    getMessage("Введите порт");
+            if(serverSocket != null){
+                if(!serverSocket.isClosed()) {
+                    getMessage("Отмените созданную игру");
+                    return;
                 }
-            }else {
-                getMessage("Введите IP адрес");
             }
+                if (!ip_field.getText().equals("")) {
+                    if (!port_field.getText().equals("")) {
+                        try {
+                            client_ip = InetAddress.getByName(ip_field.getText());
+                        } catch (UnknownHostException e) {
+                            getMessage("Неверный IP адрес");
+                            // e.printStackTrace();
+                        }
+                        try {
+                            client_port = Integer.parseInt(port_field.getText());
+                        } catch (NumberFormatException e) {
+                            getMessage("Введите корректный порт");
+                        }
+                        try {
+                            socket = new Socket(client_ip, client_port);
+                            if (socket.isConnected()) {
+                                stage.close();
+                                Game game = new Game(socket,false);
+                            } else {
+                                getMessage("Сервер недоступен");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        getMessage("Введите порт");
+                    }
+                } else {
+                    getMessage("Введите IP адрес");
+                }
         });
     }
+
+    EventHandler<KeyEvent> esc = new EventHandler<KeyEvent>() {
+        @Override
+        public void handle(KeyEvent keyEvent) {
+            if(keyEvent.getCode() == KeyCode.ESCAPE) {
+                try {
+                    stage.removeEventHandler(KeyEvent.KEY_PRESSED,esc);
+                    Menu menu = new Menu(stage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    };
 
     private void getMessage(String str){
         try {

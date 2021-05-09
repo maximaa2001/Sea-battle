@@ -43,15 +43,18 @@ public class Menu {
 
     public Menu(Stage stage) throws IOException {
         this.stage = stage;
+        stage.setWidth(1000);
+        stage.setHeight(840);
+        stage.setTitle("Меню");
         number_choose = 1;
         font = Font.loadFont(getClass().getResourceAsStream("fonts/font.ttf"), 45);
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("fxml/Menu.fxml"));
         fxmlLoader.setController(this);
         scene = new Scene(fxmlLoader.load());
         stage.setScene(scene);
+        stage.centerOnScreen();
         stage.show();
     }
-
 
 
     @FXML
@@ -121,18 +124,13 @@ public class Menu {
             if (keyEvent.getCode() == KeyCode.ENTER) {
                 switch (number_choose){
                     case 1:
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("fxml/Connect.fxml"));
                         try {
-                            Stage stage = new Stage();
-                            stage.setScene(new Scene(loader.load()));
-                            Menu.this.stage.close();
-                            stage.setTitle("Подключение");
-                            stage.setResizable(false);
-                            stage.setOnCloseRequest(windowEvent -> {
-                                System.exit(0);
-                            });
-                            stage.show();
-
+                         //   Stage stage = new Stage();
+                         //   Menu.this.stage.close();
+                            stage.removeEventHandler(KeyEvent.KEY_PRESSED,down);
+                            stage.removeEventHandler(KeyEvent.KEY_PRESSED,up);
+                            stage.removeEventHandler(KeyEvent.KEY_PRESSED,enter);
+                            Connect connect = new Connect(stage);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

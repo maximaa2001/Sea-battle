@@ -101,11 +101,19 @@ public class Ship{
         this.isMoved = isMoved;
     }
 
+    public boolean getIsHorizontal() {
+        return isHorizontal;
+    }
+
+    public void setIsHorizontal(boolean horizontal) {
+        isHorizontal = horizontal;
+    }
+
     public void drawShip(){
         for (int i = 0; i < length; i++) {
             ship_image[i].setLayoutX(posInRectangle.x+(i*40));
             ship_image[i].setLayoutY(posInRectangle.y);
-            Main.root.getChildren().add(ship_image[i]);
+            Game.root.getChildren().add(ship_image[i]);
         }
     }
 
@@ -113,7 +121,7 @@ public class Ship{
         currentImage = new Image("by/bsuir/image/black_block.png");
         boolean isRemoveAround = false;
         for (int i = 0; i < length; i++) {
-            if(!Main.root.getChildren().contains(ship_image[i])){
+            if(!Game.root.getChildren().contains(ship_image[i])){
                 int column =(int) (ship_image[i].getLayoutX() / 40);
                 int row =(int) (ship_image[i].getLayoutY() / 40);
                 if(!isRemoveAround){
@@ -124,10 +132,10 @@ public class Ship{
                     }
                     isRemoveAround = true;
                 }
-                Main.field.getField()[row][column] = "0";
+                Game.field.getField()[row][column] = "0";
 
-                Main.field.getChildren().remove(ship_image[i]);
-                Main.root.getChildren().add(ship_image[i]);
+                Game.field.getChildren().remove(ship_image[i]);
+                Game.root.getChildren().add(ship_image[i]);
             }
 
             ship_image[i].setLayoutX(posInRectangle.x + (i * 40));
@@ -226,22 +234,22 @@ public class Ship{
                      */
                     for (int i = 0; i < length; i++) {
                         if(isHorizontal) {
-                            Main.field.add(ship_image[i], column + i, row);
+                            Game.field.add(ship_image[i], column + i, row);
                         }else {
-                            Main.field.add(ship_image[i], column , row + i);
+                            Game.field.add(ship_image[i], column , row + i);
                         }
-                        Main.root.getChildren().remove(ship_image[i]);
+                        Game.root.getChildren().remove(ship_image[i]);
                     }
                     /*
                     отметка в массиве занятого места
                      */
                     if(isHorizontal){
                         for (int i = 0; i < length ; i++) {
-                           Main.field.getField()[row][column+i] = "*";
+                            Game.field.getField()[row][column+i] = "*";
                         }
                     }else {
                         for (int i = 0; i < length ; i++) {
-                           Main.field.getField()[row+i][column] = "*";
+                            Game.field.getField()[row+i][column] = "*";
                         }
                     }
                     /*
@@ -264,14 +272,14 @@ public class Ship{
                 isMoved = false;
             }
 
-            for (int i = 0; i < Main.field.getField().length; i++) {
-                for (int j = 0; j < Main.field.getField()[i].length; j++) {
-                    System.out.print(Main.field.getField()[i][j] + "  ");
-                }
-                System.out.println();
-            }
-            System.out.println();
-            System.out.println();
+//            for (int i = 0; i < Game.field.getField().length; i++) {
+//                for (int j = 0; j < Game.field.getField()[i].length; j++) {
+//                    System.out.print(Game.field.getField()[i][j] + "  ");
+//                }
+//                System.out.println();
+//            }
+//            System.out.println();
+//            System.out.println();
         }
     };
 
@@ -279,13 +287,13 @@ public class Ship{
         @Override
         public void handle(MouseEvent event) {
             if(!isCanMoved) {
-                for (int i = 0; i < Main.ships.length; i++) {
-                    if(Main.ships[i].getIsChoose()){
+                for (int i = 0; i < Game.ships.length; i++) {
+                    if(Game.ships[i].getIsChoose()){
                         currentImage = new Image("by/bsuir/image/black_block.png");
-                        for (int j = 0; j < Main.ships[i].getLength(); j++) {
-                            Main.ships[i].getShipImage()[j].setImage(currentImage);
+                        for (int j = 0; j < Game.ships[i].getLength(); j++) {
+                            Game.ships[i].getShipImage()[j].setImage(currentImage);
                         }
-                        Main.ships[i].setIsChoose(false);
+                        Game.ships[i].setIsChoose(false);
                     }
                 }
                 currentImage = new Image("by/bsuir/image/red_block.png");
@@ -330,14 +338,14 @@ public class Ship{
                 }
                 if(i == vectorY){
                     if((vectorStartX - 1) >= 0) {
-                        Main.field.getField()[i][vectorStartX - 1] = str;
+                        Game.field.getField()[i][vectorStartX - 1] = str;
                     }
                     if((vectorEndX + 1) <= 9) {
-                        Main.field.getField()[i][vectorEndX + 1] = str;
+                        Game.field.getField()[i][vectorEndX + 1] = str;
                     }
                     break;
                 }else {
-                    Main.field.getField()[i][j] = str;
+                    Game.field.getField()[i][j] = str;
                 }
             }
         }
@@ -359,14 +367,14 @@ public class Ship{
                 }
                 if(i == vectorX){
                     if(vectorStartY - 1 >= 0) {
-                        Main.field.getField()[vectorStartY - 1][i] = str;
+                        Game.field.getField()[vectorStartY - 1][i] = str;
                     }
                     if((vectorEndY + 1) <= 9) {
-                        Main.field.getField()[vectorEndY + 1][i] = str;
+                        Game.field.getField()[vectorEndY + 1][i] = str;
                     }
                     break;
                 }else {
-                    Main.field.getField()[j][i] = str;
+                    Game.field.getField()[j][i] = str;
                 }
             }
         }
@@ -378,7 +386,7 @@ public class Ship{
         int y = (int) vector.y;
 
         for (int i = startX; i <= endX; i++) {
-            if (Main.field.getField()[y][i].equals("-") || Main.field.getField()[y][i].equals("*")) {
+            if (Game.field.getField()[y][i].equals("-") || Game.field.getField()[y][i].equals("*")) {
                 return false;
             }
         }
@@ -393,18 +401,18 @@ public class Ship{
                 }
                 if(i == y){
                     if((startX - 1) >= 0) {
-                        if (Main.field.getField()[i][startX - 1].equals("*")) {
+                        if (Game.field.getField()[i][startX - 1].equals("*")) {
                             return false;
                         }
                     }
                     if((endX + 1) <= 9){
-                        if (Main.field.getField()[i][endX + 1].equals("*")) {
+                        if (Game.field.getField()[i][endX + 1].equals("*")) {
                             return false;
                         }
                     }
                     break;
                 }
-                if(Main.field.getField()[i][j].equals("*")){
+                if(Game.field.getField()[i][j].equals("*")){
                     return false;
                 }
             }
@@ -418,7 +426,7 @@ public class Ship{
         int x = (int) vector.x;
 
         for (int i = startY; i <= endY ; i++) {
-            if(Main.field.getField()[i][x].equals("-") || Main.field.getField()[i][x].equals("*")){
+            if(Game.field.getField()[i][x].equals("-") || Game.field.getField()[i][x].equals("*")){
                 return false;
             }
         }
@@ -433,18 +441,18 @@ public class Ship{
                 }
                 if(i == x){
                     if((startY - 1) >= 0) {
-                        if (Main.field.getField()[startY - 1][i].equals("*")) {
+                        if (Game.field.getField()[startY - 1][i].equals("*")) {
                             return false;
                         }
                     }
                     if((endY + 1) <= 9){
-                        if (Main.field.getField()[endY + 1][i].equals("*")) {
+                        if (Game.field.getField()[endY + 1][i].equals("*")) {
                             return false;
                         }
                     }
                     break;
                 }
-                if(Main.field.getField()[j][i].equals("*")){
+                if(Game.field.getField()[j][i].equals("*")){
                     return false;
                 }
             }
@@ -453,32 +461,32 @@ public class Ship{
     }
 
     private void addSome(){  // при отмене позиции корабля установка необходимых -
-        for (int i = 0; i < Main.field.getField().length; i++) {
-            for (int j = 0; j < Main.field.getField()[i].length; j++) {
-                if(Main.field.getField()[i][j].equals("*")){
-                    if(i - 1 >= 0 && !(Main.field.getField()[i-1][j].equals("*"))){
-                        Main.field.getField()[i-1][j] = "-";
+        for (int i = 0; i < Game.field.getField().length; i++) {
+            for (int j = 0; j < Game.field.getField()[i].length; j++) {
+                if(Game.field.getField()[i][j].equals("*")){
+                    if(i - 1 >= 0 && !(Game.field.getField()[i-1][j].equals("*"))){
+                        Game.field.getField()[i-1][j] = "-";
                     }
-                    if(i - 1 >= 0 && j-1 >=0 && !(Main.field.getField()[i-1][j-1].equals("*"))){
-                        Main.field.getField()[i-1][j-1] = "-";
+                    if(i - 1 >= 0 && j-1 >=0 && !(Game.field.getField()[i-1][j-1].equals("*"))){
+                        Game.field.getField()[i-1][j-1] = "-";
                     }
-                    if(j-1 >=0 && !(Main.field.getField()[i][j-1].equals("*"))){
-                        Main.field.getField()[i][j-1] = "-";
+                    if(j-1 >=0 && !(Game.field.getField()[i][j-1].equals("*"))){
+                        Game.field.getField()[i][j-1] = "-";
                     }
-                    if(i + 1 <= 9 && j-1 >=0 && !(Main.field.getField()[i+1][j-1].equals("*"))){
-                        Main.field.getField()[i+1][j-1] = "-";
+                    if(i + 1 <= 9 && j-1 >=0 && !(Game.field.getField()[i+1][j-1].equals("*"))){
+                        Game.field.getField()[i+1][j-1] = "-";
                     }
-                    if(i + 1 <= 9 && !(Main.field.getField()[i+1][j].equals("*"))){
-                        Main.field.getField()[i+1][j] = "-";
+                    if(i + 1 <= 9 && !(Game.field.getField()[i+1][j].equals("*"))){
+                        Game.field.getField()[i+1][j] = "-";
                     }
-                    if(i + 1 <= 9 && j+1 <=9 && !(Main.field.getField()[i+1][j+1].equals("*"))){
-                        Main.field.getField()[i+1][j+1] = "-";
+                    if(i + 1 <= 9 && j+1 <=9 && !(Game.field.getField()[i+1][j+1].equals("*"))){
+                        Game.field.getField()[i+1][j+1] = "-";
                     }
-                    if(j+1 <= 9 && !(Main.field.getField()[i][j+1].equals("*"))){
-                        Main.field.getField()[i][j+1] = "-";
+                    if(j+1 <= 9 && !(Game.field.getField()[i][j+1].equals("*"))){
+                        Game.field.getField()[i][j+1] = "-";
                     }
-                    if(i - 1 >= 0 && j+1 <=9 && !(Main.field.getField()[i-1][j+1].equals("*"))){
-                        Main.field.getField()[i-1][j+1] = "-";
+                    if(i - 1 >= 0 && j+1 <=9 && !(Game.field.getField()[i-1][j+1].equals("*"))){
+                        Game.field.getField()[i-1][j+1] = "-";
                     }
                 }
             }
@@ -494,9 +502,15 @@ public class Ship{
     }
 
     public void readyForBattle(){
-        Image image = new Image("by/bsuir/image/green_block.png");
+      //  Image image = new Image("by/bsuir/image/green_block.png");
         for (int i = 0; i < length; i++) {
-            ship_image[i].setImage(image);
+       //     ship_image[i].setImage(image);
+            ship_image[i].setImage(null);
+            int x = (int)ship_image[i].getLayoutX();
+            int y = (int) ship_image[i].getLayoutY();
+            int column = x / 40;
+            int row = y / 40;
+            Game.field.getButtonByCoordinate(row,column);
             ship_image[i].removeEventHandler(MouseEvent.MOUSE_DRAGGED,dragged);
             ship_image[i].removeEventHandler(MouseEvent.MOUSE_PRESSED,pressed);
             ship_image[i].removeEventHandler(MouseEvent.MOUSE_RELEASED,released);
