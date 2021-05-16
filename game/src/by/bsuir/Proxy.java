@@ -6,7 +6,6 @@ public class Proxy implements Serializable {
     private String id;
     private boolean isGet;
     private State state;
-    private boolean isHoriz;
 
     public Proxy(boolean isGet){
         this.isGet = isGet;
@@ -22,10 +21,6 @@ public class Proxy implements Serializable {
 
     public String getId() {
         return id;
-    }
-
-    public void setIsGet(boolean get) {
-        isGet = get;
     }
 
     public void setState(State state) {

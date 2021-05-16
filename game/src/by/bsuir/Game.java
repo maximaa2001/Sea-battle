@@ -1,7 +1,6 @@
 package by.bsuir;
 
 import javafx.application.Platform;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,14 +11,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import javax.vecmath.Vector2f;
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Set;
 
 public class Game {
     private Socket socket;
@@ -27,10 +23,12 @@ public class Game {
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private boolean isServer;
-    private volatile boolean isCanSend;
     private volatile boolean isReady;
     private volatile int time;
     private volatile Bullet bullet;
+    private volatile boolean isMyHod;
+    private volatile int countOfShips;
+    private volatile boolean isEndGame;
 
     private Label label;
     private Label whoIsMove;
@@ -54,20 +52,19 @@ public class Game {
     EventHandler<MouseEvent> clickButton = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent event) {
-            if(isCanSend) {
+            if(isMyHod) {
                 MyButton myButton = (MyButton) event.getSource();
                 bullet = new Bullet(myButton.getMyId());
-                isCanSend = false;
             }
         }
     };
 
-
-
     public Game(Socket socket, boolean isServer) throws IOException {
         this.socket = socket;
         this.isServer = isServer;
-        isCanSend = true;
+        this.isMyHod = isServer;
+        isEndGame = false;
+        countOfShips = 10;
         isReady = false;
         out = new ObjectOutputStream(socket.getOutputStream());
         in = new ObjectInputStream(socket.getInputStream());
@@ -89,9 +86,7 @@ public class Game {
             public void run() {
                 while (!socket.isClosed() && socket.isConnected()) {
                     try {
-                        System.out.println("www");
                         Proxy proxy = (Proxy) in.readObject();
-                        System.out.println("eee");
                         if (proxy.getIsGet()) {
                             break;
                         }
@@ -104,7 +99,8 @@ public class Game {
                                     @Override
                                     public void run() {
                                         try {
-                                            Menu menu = new Menu(stage);
+                                            stage.close();
+                                            Menu menu = new Menu(new Stage());
                                             WarnMessage message = new WarnMessage("Время ожидания истекло");
                                         } catch (IOException e) {
                                             e.printStackTrace();
@@ -138,7 +134,6 @@ public class Game {
             }
         });
         timeThread = new Thread(timer);
-        //  timeThread.setName("first");
         timeThread.setDaemon(true);
         timeThread.start();
 
@@ -200,16 +195,16 @@ public class Game {
         stage.setHeight(800);
         stage.show();
         stage.setOnCloseRequest(windowEvent -> {
-            if (socket.isConnected() && !socket.isClosed()) {
-                try {
-                    socket.close();
-                    WarnMessage message = new WarnMessage("Соединение потеряно");
-                } catch (IOException e) {
-                    e.printStackTrace();
+            if(!isEndGame) {
+                if (socket.isConnected() && !socket.isClosed()) {
+                    try {
+                        WarnMessage message = new WarnMessage("Соединение потеряно");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
-
     }
 
     public void initializeRootPane() {
@@ -265,7 +260,6 @@ public class Game {
         public void run() {
             boolean isRun = true;
             for (int i = 80; i > 0; i--) {
-                //   System.out.println(Thread.currentThread().getName());
                 Game.this.time = i;
                 Platform.runLater(new Runnable() {
                     @Override
@@ -276,11 +270,9 @@ public class Game {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                 //   e.printStackTrace();
                     isRun = false;
                     break;
                 }
-                ///     System.out.println(Thread.currentThread().getName() + " 8888999  ");
             }
             if (isRun && !socket.isClosed()) {
                 try {
@@ -289,7 +281,8 @@ public class Game {
                         @Override
                         public void run() {
                             try {
-                                Menu menu = new Menu(stage);
+                                stage.close();
+                                Menu menu = new Menu(new Stage());
                                 WarnMessage message = new WarnMessage("Время ожидания истекло");
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -307,54 +300,90 @@ public class Game {
         @Override
         public void run() {
             while (true) {
-                if (isServer) {
+                if (isMyHod) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            whoIsMove.setText("Вы ходите");
+                            whoIsMove.setTextFill(Color.GREEN);
+                        }
+                    });
                     makeShot();
                     try {
                         getAnswer();
                     } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
-                    setTimer();
-                    boolean isSuccess = getHit();
-                    if(!isSuccess){
-                        return;
+                    if(countOfShips == 0){
+                        break;
                     }
                 } else {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            whoIsMove.setText("Ходит соперник");
+                            whoIsMove.setTextFill(Color.RED);
+                        }
+                    });
                     boolean isSuccess = getHit();
                     if(!isSuccess){
                         return;
-                    }
-                    setTimer();
-                    makeShot();
-                    try {
-                        getAnswer();
-                    } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
                     }
                 }
                 setTimer();
             }
+            Bullet endGame = new Bullet(null);
+            endGame.setIsEndGame(true);
+            try {
+                out.writeObject(endGame);
+                out.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Win win = new Win(stage);
+                        isEndGame = true;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     };
     private void makeShot(){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                whoIsMove.setText("Вы ходите");
-                whoIsMove.setTextFill(Color.GREEN);
-            }
-        });
         while (true) {
             if (bullet != null) {
                 try {
                     out.writeObject(bullet);
-                 //   System.out.println("+");
-                  //  System.out.println(bullet.getId());
                     out.flush();
                     bullet = null;
                     return;
                 } catch (IOException e) {
                     e.printStackTrace();
+                    try {
+                        if(!socket.isClosed()) {
+                            isEndGame = true;
+                            socket.close();
+                        }
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    stage.close();
+                                    Menu menu = new Menu(new Stage());
+                                    WarnMessage message = new WarnMessage("Соединение с игроком потеряно2");
+                                } catch (IOException ioException) {
+                                    ioException.printStackTrace();
+                                }
+
+                            }
+                        });
+                    } catch (IOException ioException) {
+                        ioException.printStackTrace();
+                    }
                 }
             }
         }
@@ -368,76 +397,83 @@ public class Game {
     }
 
     private boolean getHit(){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                whoIsMove.setText("Ходит соперник");
-                whoIsMove.setTextFill(Color.RED);
-            }
-        });
         while (true) {
             try {
                 Bullet bullet = (Bullet) in.readObject();
-                Proxy proxy = field.checkedField(bullet.getId());
-                if(proxy.getIsGet() && proxy.getState().equals(State.WOUND)){
-                    field.getButtonById(bullet.getId()).getStyleClass().remove("aliveButton");
-                    field.getButtonById(bullet.getId()).getStyleClass().add("killButton");
-                }else if(proxy.getIsGet() && proxy.getState().equals(State.KILL)) {
-                    field.getButtonById(bullet.getId()).getStyleClass().remove("aliveButton");
-                    field.getButtonById(bullet.getId()).getStyleClass().add("killButton");
-                    MyButton buttonById = field.getButtonById(bullet.getId());
-                    Vector2f vector2f = new Vector2f((float) buttonById.getLayoutX(), (float) buttonById.getLayoutY());
-                    int myRow = (int) vector2f.y / 40;
-                    int myColumn = (int) vector2f.x / 40;
-                    //  System.out.println(vector2f.x + "   " + vector2f.y);
-                    Ship ship = null;
-                    boolean isFind = false;
-                    for (int i = 0; i < ships.length; i++) {
-                        for (int j = 0; j < ships[i].getShipImage().length; j++) {
-                            int r = (int) ships[i].getShipImage()[j].getLayoutY() / 40;
-                            int c = (int) ships[i].getShipImage()[j].getLayoutX() / 40;
-//                            System.out.println(ships[i].getShipImage()[j].getLayoutX() + "   " +  vector2f.x );
-//                            System.out.println(ships[i].getShipImage()[j].getLayoutY() + "   " +  vector2f.y );
-                            if ((myRow == r) && (myColumn == c)) {
-                                ship = ships[i];
-                                isFind = true;
-                                break;
-                            }
-                            if (isFind) {
-                                break;
-                            }
-                        }
-                    }
-                    int column = (int) (ship.getShipImage()[0].getLayoutX() / 40);
-                    int row = (int) (ship.getShipImage()[0].getLayoutY() / 40);
-                    int length = ship.getLength();
-                    boolean isHoriz = ship.getIsHorizontal();
-                    makeAroundYellowField(column,row,length,isHoriz,field,false);
-                }else if (!proxy.getIsGet()) {
-                    field.getButtonById(bullet.getId()).getStyleClass().add("mimoButton");
-                }
-          //      System.out.println(bullet.getId());
-                // отпраивть ответ
-                out.writeObject(proxy);
-                out.flush();
-                isCanSend = true;
-                return true;
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                try {
-                    socket.close();
+                if(bullet.getIsEndGame()){
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                Menu menu = new Menu(stage);
-                                WarnMessage message = new WarnMessage("Соединение с игроком потеряно");
-                            } catch (IOException ioException) {
-                                ioException.printStackTrace();
+                                Lose lose = new Lose(stage);
+                                socket.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
-
                         }
                     });
+                }else {
+                    Proxy proxy = field.checkedField(bullet.getId());
+                    if (proxy.getIsGet() && proxy.getState().equals(State.WOUND)) {
+                        isMyHod = false;
+                        field.getButtonById(bullet.getId()).getStyleClass().remove("aliveButton");
+                        field.getButtonById(bullet.getId()).getStyleClass().add("killButton");
+                    } else if (proxy.getIsGet() && proxy.getState().equals(State.KILL)) {
+                        isMyHod = false;
+                        field.getButtonById(bullet.getId()).getStyleClass().remove("aliveButton");
+                        field.getButtonById(bullet.getId()).getStyleClass().add("killButton");
+                        MyButton buttonById = field.getButtonById(bullet.getId());
+                        Vector2f vector2f = new Vector2f((float) buttonById.getLayoutX(), (float) buttonById.getLayoutY());
+                        int myRow = (int) vector2f.y / 40;
+                        int myColumn = (int) vector2f.x / 40;
+                        Ship ship = null;
+                        boolean isFind = false;
+                        for (int i = 0; i < ships.length; i++) {
+                            for (int j = 0; j < ships[i].getShipImage().length; j++) {
+                                int r = (int) ships[i].getShipImage()[j].getLayoutY() / 40;
+                                int c = (int) ships[i].getShipImage()[j].getLayoutX() / 40;
+                                if ((myRow == r) && (myColumn == c)) {
+                                    ship = ships[i];
+                                    isFind = true;
+                                    break;
+                                }
+                                if (isFind) {
+                                    break;
+                                }
+                            }
+                        }
+                        int column = (int) (ship.getShipImage()[0].getLayoutX() / 40);
+                        int row = (int) (ship.getShipImage()[0].getLayoutY() / 40);
+                        int length = ship.getLength();
+                        boolean isHoriz = ship.getIsHorizontal();
+                        makeAroundYellowField(column, row, length, isHoriz, field, false);
+                    } else if (!proxy.getIsGet()) {
+                        isMyHod = true;
+                        field.getButtonById(bullet.getId()).getStyleClass().add("mimoButton");
+                    }
+                    out.writeObject(proxy);
+                    out.flush();
+                    return true;
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                try {
+                    if(!socket.isClosed()) {
+                        socket.close();
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    stage.close();
+                                    Menu menu = new Menu(new Stage());
+                                    WarnMessage message = new WarnMessage("Соединение с игроком потеряно3");
+                                } catch (IOException ioException) {
+                                    ioException.printStackTrace();
+                                }
+
+                            }
+                        });
+                    }
                     return false;
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
@@ -445,7 +481,6 @@ public class Game {
             }
         }
     }
-
 
     private void getAnswer() throws IOException, ClassNotFoundException {
         Proxy proxy = null;
@@ -456,8 +491,10 @@ public class Game {
         if(proxy.getIsGet() && proxy.getState().equals(State.WOUND)){
             enemy.getButtonById(proxy.getId()).getStyleClass().remove("aliveButton");
             enemy.getButtonById(proxy.getId()).getStyleClass().add("killButton");
+            isMyHod = true;
             enemy.getButtonById(proxy.getId()).removeEventHandler(MouseEvent.MOUSE_CLICKED,clickButton);
         }else if(proxy.getIsGet() && proxy.getState().equals(State.KILL)) {
+            isMyHod = true;
             enemy.getButtonById(proxy.getId()).getStyleClass().remove("aliveButton");
             enemy.getButtonById(proxy.getId()).getStyleClass().add("killButton");
             String id = proxy.getId();
@@ -467,6 +504,7 @@ public class Game {
                 row = 0;
                 column = Integer.parseInt(id);
             }else {
+       //        isMyHod = false;
                 row = Integer.parseInt(String.valueOf(id.charAt(0)));
                 column = Integer.parseInt(String.valueOf(id.charAt(1)));
             }
@@ -522,8 +560,10 @@ public class Game {
             }else {
                 makeAroundYellowField(column, rowMostTop, length, false, enemy, true);
             }
-            enemy.getButtonById(proxy.getId()).removeEventHandler(MouseEvent.MOUSE_CLICKED,clickButton);
+            countOfShips--;
+        //    enemy.getButtonById(proxy.getId()).removeEventHandler(MouseEvent.MOUSE_CLICKED,clickButton);
         }else if (!proxy.getIsGet()) {
+            isMyHod = false;
             enemy.getButtonById(proxy.getId()).getStyleClass().add("mimoButton");
             enemy.getButtonById(proxy.getId()).removeEventHandler(MouseEvent.MOUSE_CLICKED,clickButton);
         }

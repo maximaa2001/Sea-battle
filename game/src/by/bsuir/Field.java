@@ -1,10 +1,7 @@
 package by.bsuir;
 
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 public class Field extends GridPane {
     private String[][] field;
@@ -15,10 +12,10 @@ public class Field extends GridPane {
         buttons = new MyButton[100];
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new MyButton(String.valueOf(i));
-            int finalI = i;
-            buttons[i].setOnMouseClicked(event -> {
-                System.out.println(this.buttons[finalI].getLayoutX());
-            });
+//            int finalI = i;
+//            buttons[i].setOnMouseClicked(event -> {
+//                System.out.println(this.buttons[finalI].getLayoutX());
+//            });
         }
 
         this.setGridLinesVisible(true);
@@ -192,7 +189,7 @@ public class Field extends GridPane {
             return false;
         }else if(field[row][column].equals("r")){
             if((column+1) <= 9) {
-                return isExistLeft(column + 1, row);
+                return isExistRight(column + 1, row);
             }else {
                 return false;
             }
@@ -206,7 +203,7 @@ public class Field extends GridPane {
             return false;
         }else if(field[row][column].equals("r")){
             if((row - 1) >= 0) {
-                return isExistLeft(column, row - 1);
+                return isExistTop(column, row - 1);
             }else {
                 return false;
             }
@@ -220,7 +217,7 @@ public class Field extends GridPane {
             return false;
         }else if(field[row][column].equals("r")){
             if((row + 1) <= 9) {
-                return isExistLeft(column, row + 1);
+                return isExistDown(column, row + 1);
             }else {
                 return false;
             }

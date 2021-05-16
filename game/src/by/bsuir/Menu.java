@@ -125,17 +125,21 @@ public class Menu {
                 switch (number_choose){
                     case 1:
                         try {
-                         //   Stage stage = new Stage();
-                         //   Menu.this.stage.close();
                             stage.removeEventHandler(KeyEvent.KEY_PRESSED,down);
                             stage.removeEventHandler(KeyEvent.KEY_PRESSED,up);
                             stage.removeEventHandler(KeyEvent.KEY_PRESSED,enter);
-                            Connect connect = new Connect(stage);
+                            stage.close();
+                            Connect connect = new Connect(new Stage());
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                         break;
                     case 2:
+                        try {
+                            About about = new About(stage);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         break;
                     case 3:
                         Menu.this.stage.close();
