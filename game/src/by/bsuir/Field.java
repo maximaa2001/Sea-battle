@@ -7,20 +7,16 @@ public class Field extends GridPane {
     private String[][] field;
     private volatile MyButton[] buttons;
 
-    Field(){
+    Field() {
         field = new String[10][10];
         buttons = new MyButton[100];
         for (int i = 0; i < buttons.length; i++) {
             buttons[i] = new MyButton(String.valueOf(i));
-//            int finalI = i;
-//            buttons[i].setOnMouseClicked(event -> {
-//                System.out.println(this.buttons[finalI].getLayoutX());
-//            });
         }
 
         this.setGridLinesVisible(true);
 
-        for (int i = 0; i < 10 ; i++) {
+        for (int i = 0; i < 10; i++) {
             this.getColumnConstraints().add(new ColumnConstraints(40));
             this.getRowConstraints().add(new RowConstraints(40));
         }
@@ -45,109 +41,107 @@ public class Field extends GridPane {
         }
     }
 
-    public void getButtonByCoordinate(int row, int column){
+    public void fillGreenButton(int row, int column) {
         String id = "";
-        if(row == 0){
+        if (row == 0) {
             id += String.valueOf(column);
-        }else {
+        } else {
             id += String.valueOf(row);
             id += String.valueOf(column);
         }
-        for (int i = 0; i < buttons.length ; i++) {
-            if(buttons[i].getMyId().equals(id)){
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].getMyId().equals(id)) {
                 buttons[i].getStyleClass().add("aliveButton");
                 break;
             }
         }
     }
 
-    public String getIdByCoordinate(int row, int column){
+    public String getIdByCoordinate(int row, int column) {
         String id = "";
-        if(row == 0){
+        if (row == 0) {
             id += String.valueOf(column);
-        }else {
+        } else {
             id += String.valueOf(row);
             id += String.valueOf(column);
         }
         return id;
     }
 
-    public MyButton getButtonById(String id){
-        for (int i = 0; i < buttons.length ; i++) {
-            if(buttons[i].getMyId().equals(id)){
+    public MyButton getButtonById(String id) {
+        for (int i = 0; i < buttons.length; i++) {
+            if (buttons[i].getMyId().equals(id)) {
                 return buttons[i];
             }
         }
         return null;
     }
 
-    public Proxy checkedField(String id){
+    public Proxy checkedField(String id) {
         int row;
         int column;
         Proxy proxy = null;
-        if(id.length() == 1){
+        if (id.length() == 1) {
             row = 0;
             column = Integer.parseInt(id);
-        }else {
+        } else {
             row = Integer.parseInt(String.valueOf(id.charAt(0)));
             column = Integer.parseInt(String.valueOf(id.charAt(1)));
         }
-        if(field[row][column].equals("0")){
+        if (field[row][column].equals("0")) {
             proxy = new Proxy(false);
             proxy.setState(State.PAST);
             proxy.setId(id);
-        }
-        else if(field[row][column].equals("-")){
+        } else if (field[row][column].equals("-")) {
             proxy = new Proxy(false);
             proxy.setState(State.PAST);
             proxy.setId(id);
-        }
-        else if(field[row][column].equals("*")){
+        } else if (field[row][column].equals("*")) {
             field[row][column] = "r";
             proxy = new Proxy(true);
             proxy.setState(State.KILL);
             proxy.setId(id);
-            if(column - 1 >= 0){
-                if(field[row][column-1].equals("*")){
+            if (column - 1 >= 0) {
+                if (field[row][column - 1].equals("*")) {
                     proxy.setState(State.WOUND);
                     return proxy;
-                }else if(field[row][column-1].equals("r")){
-                    if(isExistLeft(column-1,row)){
+                } else if (field[row][column - 1].equals("r")) {
+                    if (isExistLeft(column - 1, row)) {
                         proxy.setState(State.WOUND);
                     }
                 }
             }
-            if(column + 1 <= 9){
-                if(field[row][column+1].equals("*")){
+            if (column + 1 <= 9) {
+                if (field[row][column + 1].equals("*")) {
                     proxy.setState(State.WOUND);
                     return proxy;
-                }else if(field[row][column+1].equals("r")){
-                    if(isExistRight(column+1,row)){
+                } else if (field[row][column + 1].equals("r")) {
+                    if (isExistRight(column + 1, row)) {
                         proxy.setState(State.WOUND);
                     }
                 }
             }
-            if(row - 1 >= 0){
-                if(field[row-1][column].equals("*")){
+            if (row - 1 >= 0) {
+                if (field[row - 1][column].equals("*")) {
                     proxy.setState(State.WOUND);
                     return proxy;
-                }else if(field[row-1][column].equals("r")){
-                    if(isExistTop(column,row-1)){
+                } else if (field[row - 1][column].equals("r")) {
+                    if (isExistTop(column, row - 1)) {
                         proxy.setState(State.WOUND);
                     }
                 }
             }
-            if(row + 1 <= 9){
-                if(field[row+1][column].equals("*")){
+            if (row + 1 <= 9) {
+                if (field[row + 1][column].equals("*")) {
                     proxy.setState(State.WOUND);
                     return proxy;
-                }else if(field[row+1][column].equals("r")){
-                    if(isExistDown(column,row+1)){
+                } else if (field[row + 1][column].equals("r")) {
+                    if (isExistDown(column, row + 1)) {
                         proxy.setState(State.WOUND);
                     }
                 }
             }
-        }else {
+        } else {
             proxy = new Proxy(false);
             proxy.setState(State.PAST);
             proxy.setId(id);
@@ -171,57 +165,58 @@ public class Field extends GridPane {
         this.buttons = buttons;
     }
 
-    private boolean isExistLeft(int column, int row){
-        if(field[row][column].equals("0") || field[row][column].equals("-")){
+    private boolean isExistLeft(int column, int row) {
+        if (field[row][column].equals("0") || field[row][column].equals("-")) {
             return false;
-        }else if(field[row][column].equals("r")){
-            if((column - 1) >= 0) {
+        } else if (field[row][column].equals("r")) {
+            if ((column - 1) >= 0) {
                 return isExistLeft(column - 1, row);
-            }else {
+            } else {
                 return false;
             }
-        }else {
+        } else {
             return true;
         }
     }
-    private boolean isExistRight(int column, int row){
-        if(field[row][column].equals("0") || field[row][column].equals("-")){
+
+    private boolean isExistRight(int column, int row) {
+        if (field[row][column].equals("0") || field[row][column].equals("-")) {
             return false;
-        }else if(field[row][column].equals("r")){
-            if((column+1) <= 9) {
+        } else if (field[row][column].equals("r")) {
+            if ((column + 1) <= 9) {
                 return isExistRight(column + 1, row);
-            }else {
+            } else {
                 return false;
             }
-        }else {
+        } else {
             return true;
         }
     }
 
-    private boolean isExistTop(int column, int row){
-        if(field[row][column].equals("0") || field[row][column].equals("-")){
+    private boolean isExistTop(int column, int row) {
+        if (field[row][column].equals("0") || field[row][column].equals("-")) {
             return false;
-        }else if(field[row][column].equals("r")){
-            if((row - 1) >= 0) {
+        } else if (field[row][column].equals("r")) {
+            if ((row - 1) >= 0) {
                 return isExistTop(column, row - 1);
-            }else {
+            } else {
                 return false;
             }
-        }else {
+        } else {
             return true;
         }
     }
 
-    private boolean isExistDown(int column, int row){
-        if(field[row][column].equals("0") || field[row][column].equals("-")){
+    private boolean isExistDown(int column, int row) {
+        if (field[row][column].equals("0") || field[row][column].equals("-")) {
             return false;
-        }else if(field[row][column].equals("r")){
-            if((row + 1) <= 9) {
+        } else if (field[row][column].equals("r")) {
+            if ((row + 1) <= 9) {
                 return isExistDown(column, row + 1);
-            }else {
+            } else {
                 return false;
             }
-        }else {
+        } else {
             return true;
         }
     }

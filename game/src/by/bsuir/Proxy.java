@@ -7,7 +7,7 @@ public class Proxy implements Serializable {
     private boolean isGet;
     private State state;
 
-    public Proxy(boolean isGet){
+    public Proxy(boolean isGet) {
         this.isGet = isGet;
     }
 

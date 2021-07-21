@@ -6,23 +6,13 @@ public class MyButton extends Button {
     private String myId;
     private boolean isShip;
 
-    public MyButton(boolean isShip, String myId){
+    public MyButton(boolean isShip, String myId) {
         this(myId);
         this.isShip = isShip;
     }
 
-    public MyButton(String myId){
+    public MyButton(String myId) {
         this.myId = myId;
-//        this.setStyle("-fx-background-color: #D3D3D3");
-//        this.setStyle("-fx-border-color: black");
-//
-//        this.setOnMouseEntered(event ->{
-//            this.setStyle("-fx-border-color:red");
-//        });
-//        this.setOnMouseExited(event ->{
-//            this.setStyle("-fx-border-color: black");
-//        });
-
     }
 
     public boolean getIsShip() {
@@ -40,5 +30,4 @@ public class MyButton extends Button {
     public void setMyId(String myId) {
         this.myId = myId;
     }
-
 }

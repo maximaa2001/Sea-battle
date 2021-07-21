@@ -6,7 +6,7 @@ public class Bullet implements Serializable {
     private String id;
     private boolean isEndGame;
 
-    public Bullet(String id){
+    public Bullet(String id) {
         this.id = id;
         isEndGame = false;
     }

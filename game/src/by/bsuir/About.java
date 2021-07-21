@@ -56,13 +56,13 @@ public class About {
         label.setFont(font);
         back_link.setFont(font);
         imageview.setImage(new Image("by/bsuir/image/qr_code.png"));
-        stage.addEventHandler(KeyEvent.KEY_PRESSED,esc);
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, esc);
     }
 
     EventHandler<KeyEvent> esc = new EventHandler<KeyEvent>() {
         @Override
         public void handle(KeyEvent keyEvent) {
-            if(keyEvent.getCode() == KeyCode.ESCAPE){
+            if (keyEvent.getCode() == KeyCode.ESCAPE) {
                 try {
                     stage.close();
                     Menu menu = new Menu(new Stage());

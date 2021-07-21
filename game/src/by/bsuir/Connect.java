@@ -73,28 +73,27 @@ public class Connect {
 
     @FXML
     void initialize() {
-        stage.addEventHandler(KeyEvent.KEY_PRESSED,esc);
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, esc);
         btn_create.setOnMouseClicked(event -> {
-            if(serverSocket != null){
-                if(!serverSocket.isClosed()){
+            if (serverSocket != null) {
+                if (!serverSocket.isClosed()) {
                     getMessage("Отмените созданную игру");
                     return;
                 }
             }
-            if(!server_port_field.getText().equals("")) {
+            if (!server_port_field.getText().equals("")) {
                 try {
                     server_port = Integer.parseInt(server_port_field.getText());
-                }catch (NumberFormatException e){
+                } catch (NumberFormatException e) {
                     getMessage("Введите корректный порт");
                     return;
                 }
                 try {
-                    serverSocket = new ServerSocket(server_port,1);
+                    serverSocket = new ServerSocket(server_port, 1);
                     waitingGamer = new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
-                                System.out.println("второй поток");
                                 socket = serverSocket.accept();
                                 Platform.runLater(new Runnable() {
                                     @Override
@@ -102,18 +101,16 @@ public class Connect {
                                         try {
                                             Stage stage = (Stage) btn_cancel.getScene().getWindow();
                                             stage.close();
-                                            Game game = new Game(socket,true);
+                                            Game game = new Game(socket, true);
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
                                     }
                                 });
-                                System.out.println("второй поток закрыт");
-
                             } catch (IOException e) {
                                 e.printStackTrace();
-                            }finally {
-                                if(!serverSocket.isClosed()){
+                            } finally {
+                                if (!serverSocket.isClosed()) {
                                     try {
                                         serverSocket.close();
                                     } catch (IOException e) {
@@ -130,15 +127,16 @@ public class Connect {
                     label_state.setTextFill(Color.GREEN);
                 } catch (IOException e) {
                     getMessage("Попробуйте использовать другой порт");
-              //      e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    getMessage("Попробуйте использовать другой порт");
                 }
-            }else {
-               getMessage("Введите номер порта");
+            } else {
+                getMessage("Введите номер порта");
             }
         });
 
         btn_cancel.setOnMouseClicked(event -> {
-            if(serverSocket != null && !serverSocket.isClosed()){
+            if (serverSocket != null && !serverSocket.isClosed()) {
                 try {
                     serverSocket.close();
                     label_state.setText("Игра не создана");
@@ -150,51 +148,52 @@ public class Connect {
         });
 
         btn_connect.setOnMouseClicked(event -> {
-            if(serverSocket != null){
-                if(!serverSocket.isClosed()) {
+            if (serverSocket != null) {
+                if (!serverSocket.isClosed()) {
                     getMessage("Отмените созданную игру");
                     return;
                 }
             }
-                if (!ip_field.getText().equals("")) {
-                    if (!port_field.getText().equals("")) {
-                        try {
-                            client_ip = InetAddress.getByName(ip_field.getText());
-                        } catch (UnknownHostException e) {
-                            getMessage("Неверный IP адрес");
-                            // e.printStackTrace();
+            if (!ip_field.getText().equals("")) {
+                if (!port_field.getText().equals("")) {
+                    try {
+                        client_ip = InetAddress.getByName(ip_field.getText());
+                    } catch (UnknownHostException e) {
+                        getMessage("Неверный IP адрес");
+                    }
+                    try {
+                        client_port = Integer.parseInt(port_field.getText());
+                    } catch (NumberFormatException e) {
+                        getMessage("Введите корректный порт");
+                    }
+                    try {
+                        socket = new Socket(client_ip, client_port);
+                        if (socket.isConnected()) {
+                            stage.close();
+                            Game game = new Game(socket, false);
+                        } else {
+                            getMessage("Сервер недоступен");
                         }
-                        try {
-                            client_port = Integer.parseInt(port_field.getText());
-                        } catch (NumberFormatException e) {
-                            getMessage("Введите корректный порт");
-                        }
-                        try {
-                            socket = new Socket(client_ip, client_port);
-                            if (socket.isConnected()) {
-                                stage.close();
-                                Game game = new Game(socket,false);
-                            } else {
-                                getMessage("Сервер недоступен");
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        getMessage("Введите порт");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (IllegalArgumentException e) {
+                        getMessage("Неверный порт");
                     }
                 } else {
-                    getMessage("Введите IP адрес");
+                    getMessage("Введите порт");
                 }
+            } else {
+                getMessage("Введите IP адрес");
+            }
         });
     }
 
     EventHandler<KeyEvent> esc = new EventHandler<KeyEvent>() {
         @Override
         public void handle(KeyEvent keyEvent) {
-            if(keyEvent.getCode() == KeyCode.ESCAPE) {
+            if (keyEvent.getCode() == KeyCode.ESCAPE) {
                 try {
-                    stage.removeEventHandler(KeyEvent.KEY_PRESSED,esc);
+                    stage.removeEventHandler(KeyEvent.KEY_PRESSED, esc);
                     Menu menu = new Menu(stage);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -203,7 +202,7 @@ public class Connect {
         }
     };
 
-    private void getMessage(String str){
+    private void getMessage(String str) {
         try {
             WarnMessage message = new WarnMessage(str);
         } catch (IOException e) {

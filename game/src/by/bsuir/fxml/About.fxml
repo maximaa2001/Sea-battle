@@ -6,17 +6,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefHeight="840.0" prefWidth="1000.0" styleClass="anchor" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="label" alignment="TOP_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="263.0" prefWidth="911.0" text="Данное игровое программно средство написано студентом Белорусского Государственного Университета  Информатики и Радиоэлектроники Авсюкевичем Максимом" textFill="WHITE" wrapText="true">
+      <Label fx:id="label" alignment="TOP_LEFT" layoutX="14.0" layoutY="14.0" prefHeight="263.0" prefWidth="911.0" text="Данное игровое программное средство написано студентом Белорусского Государственного Университета  Информатики и Радиоэлектроники Авсюкевичем Максимом" textFill="WHITE" wrapText="true">
          <font>
             <Font size="36.0" />
          </font>
       </Label>
       <ImageView fx:id="imageview" fitHeight="417.0" fitWidth="500.0" layoutX="291.0" layoutY="354.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="291.0" AnchorPane.rightAnchor="292.0">
          <image>
-            <Image url="@'" />
+            <Image url="@../image/qr_code.png" />
          </image>
       </ImageView>
       <Label fx:id="back_link" layoutX="351.0" layoutY="249.0" prefHeight="56.0" prefWidth="297.0" text="Обратнаяя связь" textFill="RED">
